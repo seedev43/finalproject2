@@ -10,36 +10,15 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 )
 
-var validate = validator.New()
-
 func UserRegister(ctx *gin.Context) {
-	var user models.User
-	var request dto.UserRegister
+	user := models.User{}
 
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
 		return
-	}
-
-	_, err := govalidator.ValidateStruct(request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	hashPass := helpers.HashPass(request.Password)
-
-	user = models.User{
-		Username: request.Username,
-		Email:    request.Email,
-		Password: hashPass,
-		Age:      request.Age,
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
