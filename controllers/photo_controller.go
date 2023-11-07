@@ -2,41 +2,25 @@ package controllers
 
 import (
 	"fp2/database"
-	"fp2/dto"
 	"fp2/models"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
 func CreatePhoto(ctx *gin.Context) {
-	var photo models.Photo
-	var request dto.PostPhoto
+	photo := models.Photo{}
 
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userId := uint(userData["id"].(float64))
 
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	if err := ctx.ShouldBindJSON(&photo); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
 		return
 	}
 
-	_, err := govalidator.ValidateStruct(request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	photo = models.Photo{
-		Title:    request.Title,
-		Caption:  request.Caption,
-		PhotoUrl: request.PhotoUrl,
-		UserId:   userId,
-	}
+	photo.UserId = userId
 
 	if err := database.DB.Create(&photo).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -52,4 +36,17 @@ func CreatePhoto(ctx *gin.Context) {
 		"user_id":    photo.UserId,
 		"created_at": photo.CreatedAt,
 	})
+}
+
+func GetPhotos(ctx *gin.Context) {
+	photos := []models.Photo{}
+
+	if err := database.DB.Preload("User").Find(&photos).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, photos)
 }

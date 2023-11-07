@@ -1,13 +1,31 @@
 package models
 
-import "time"
+import (
+	"fp2/dto"
+	"time"
+
+	"github.com/asaskevich/govalidator"
+	"gorm.io/gorm"
+)
 
 type Photo struct {
 	Id        uint      `gorm:"primaryKey" json:"id"`
-	Title     string    `gorm:"type:varchar(155)" json:"title"`
+	Title     string    `gorm:"type:varchar(155)" json:"title" valid:"required~Your title is required"`
 	Caption   string    `json:"caption"`
-	PhotoUrl  string    `json:"photo_url"`
+	PhotoUrl  string    `json:"photo_url" valid:"required~Your photo_url is required"`
 	UserId    uint      `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	User      dto.UserResponse
+}
+
+func (p *Photo) BeforeCreate(tx *gorm.DB) (err error) {
+	_, errCreate := govalidator.ValidateStruct(p)
+
+	if errCreate != nil {
+		err = errCreate
+		return
+	}
+	err = nil
+	return
 }

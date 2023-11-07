@@ -21,7 +21,7 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Create(&user).Error; err != nil {
+	if err := database.DB.Create(&models.User{Username: user.Username, Email: user.Email, Password: user.Password, Age: user.Age}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -37,25 +37,17 @@ func UserRegister(ctx *gin.Context) {
 }
 
 func UserLogin(ctx *gin.Context) {
-	var user models.User
-	var request dto.UserLogin
+	user := models.User{}
 
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
 		return
+
 	}
 
-	_, err := govalidator.ValidateStruct(request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	password := user.Password
 
-	password := request.Password
-
-	if err := database.DB.Where("email = ?", request.Email).Take(&user).Error; err != nil {
+	if err := database.DB.Where("email = ?", user.Email).Take(&user).Error; err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error":   "Unathorized",
 			"message": "Email not registered",
@@ -75,13 +67,13 @@ func UserLogin(ctx *gin.Context) {
 
 	token := helpers.GenerateToken(user.Id, user.Email)
 	ctx.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"token": "Bearer " + token,
 	})
 }
 
 func UserUpdate(ctx *gin.Context) {
-	var user models.User
-	var request dto.UserUpdate
+	user := models.User{}
+	request := dto.UserUpdate{}
 	id, _ := strconv.Atoi(ctx.Param("userId"))
 
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
@@ -89,6 +81,14 @@ func UserUpdate(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		return
+	}
+
+	_, err := govalidator.ValidateStruct(request)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -120,7 +120,7 @@ func UserUpdate(ctx *gin.Context) {
 }
 
 func UserDelete(ctx *gin.Context) {
-	var user models.User
+	user := models.User{}
 
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userId := uint(userData["id"].(float64))

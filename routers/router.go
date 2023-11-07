@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 	photo := router.Group("/photos")
 	{
 		photo.POST("/", middlewares.Authentication(), controllers.CreatePhoto)
+		photo.GET("/", middlewares.Authentication(), controllers.GetPhotos)
 	}
 
 	return router

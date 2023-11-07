@@ -1,8 +1,11 @@
 package dto
 
-type UserRegistered struct {
+type UserResponse struct {
 	Id       uint   `json:"id"`
-	Username string `json:"username" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Age      int    `json:"age" validate:"required,min=8"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+}
+
+func (UserResponse) TableName() string {
+	return "users"
 }
