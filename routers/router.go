@@ -21,8 +21,11 @@ func SetupRouter() *gin.Engine {
 
 	photo := router.Group("/photos")
 	{
-		photo.POST("/", middlewares.Authentication(), controllers.CreatePhoto)
-		photo.GET("/", middlewares.Authentication(), controllers.GetPhotos)
+		photo.Use(middlewares.Authentication())
+		photo.POST("/", controllers.CreatePhoto)
+		photo.GET("/", controllers.GetPhotos)
+		photo.PUT("/:photoId", controllers.UpdatePhoto)
+		photo.DELETE("/:photoId", controllers.DeletePhoto)
 	}
 
 	return router

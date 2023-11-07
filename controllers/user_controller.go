@@ -21,7 +21,7 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Create(&models.User{Username: user.Username, Email: user.Email, Password: user.Password, Age: user.Age}).Error; err != nil {
+	if err := database.DB.Create(&user).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
