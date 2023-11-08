@@ -24,6 +24,7 @@ func SetupRouter() *gin.Engine {
 		photo.Use(middlewares.Authentication())
 		photo.POST("/", controllers.CreatePhoto)
 		photo.GET("/", controllers.GetPhotos)
+		photo.GET("/:photoId", controllers.GetPhoto)
 		photo.PUT("/:photoId", controllers.UpdatePhoto)
 		photo.DELETE("/:photoId", controllers.DeletePhoto)
 	}
@@ -33,8 +34,19 @@ func SetupRouter() *gin.Engine {
 		comment.Use(middlewares.Authentication())
 		comment.POST("/", controllers.CreateComment)
 		comment.GET("/", controllers.GetComments)
+		comment.GET("/:commentId", controllers.GetComment)
 		comment.PUT("/:commentId", controllers.UpdateComment)
 		comment.DELETE("/:commentId", controllers.DeleteComment)
+	}
+
+	social_media := router.Group("/socialmedias")
+	{
+		social_media.Use(middlewares.Authentication())
+		social_media.POST("/", controllers.CreateSocialMedia)
+		social_media.GET("/", controllers.GetSocialMedias)
+		social_media.GET("/:socialMediaId", controllers.GetSocialMedia)
+		social_media.PUT("/:socialMediaId", controllers.UpdateSocialMedia)
+		social_media.DELETE("/:socialMediaId", controllers.DeleteSocialMedia)
 	}
 
 	return router

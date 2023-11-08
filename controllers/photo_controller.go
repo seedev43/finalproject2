@@ -41,6 +41,21 @@ func CreatePhoto(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+func GetPhoto(ctx *gin.Context) {
+	photo := models.Photo{}
+	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
+
+	if err := database.DB.Preload("User").First(&photo, photoId).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error":   "Not Found",
+			"message": "Data not found",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, photo)
+}
+
 func GetPhotos(ctx *gin.Context) {
 	photos := []models.Photo{}
 

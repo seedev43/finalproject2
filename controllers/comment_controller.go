@@ -49,6 +49,21 @@ func CreateComment(ctx *gin.Context) {
 
 }
 
+func GetComment(ctx *gin.Context) {
+	comment := models.Comment{}
+	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
+
+	if err := database.DB.Preload("User").Preload("Photo").First(&comment, commentId).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error":   "Not Found",
+			"message": "Data not found",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
+
 func GetComments(ctx *gin.Context) {
 	comments := []models.Comment{}
 

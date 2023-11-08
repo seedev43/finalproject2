@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fp2/models"
 	"log"
 	"os"
 
@@ -29,6 +28,6 @@ func InitDB() (*gorm.DB, error) {
 	connection := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8mb4&parseTime=True&loc=Local"
 	DB, err = gorm.Open(mysql.Open(connection), &gorm.Config{})
 
-	DB.AutoMigrate(&models.User{}, models.Photo{}, models.Comment{}, models.SocialMedia{})
+	// DB.AutoMigrate(&models.User{}, models.Photo{}, models.Comment{}, models.SocialMedia{})
 	return DB, err
 }

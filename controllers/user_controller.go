@@ -104,13 +104,15 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"id":         user.Id,
-		"email":      user.Email,
-		"username":   user.Username,
-		"age":        user.Age,
-		"updated_at": user.UpdatedAt,
-	})
+	res := dto.UserUpdateResponse{
+		Id:        user.Id,
+		Email:     user.Email,
+		Username:  user.Username,
+		Age:       user.Age,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	ctx.JSON(http.StatusOK, res)
 
 }
 
