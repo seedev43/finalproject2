@@ -106,7 +106,7 @@ func UpdateSocialMedia(ctx *gin.Context) {
 		UserId:         socialMedia.UserId,
 		UpdatedAt:      socialMedia.UpdatedAt,
 	}
-	ctx.JSON(http.StatusCreated, res)
+	ctx.JSON(http.StatusOK, res)
 }
 
 func DeleteSocialMedia(ctx *gin.Context) {
