@@ -28,5 +28,14 @@ func SetupRouter() *gin.Engine {
 		photo.DELETE("/:photoId", controllers.DeletePhoto)
 	}
 
+	comment := router.Group("/comments")
+	{
+		comment.Use(middlewares.Authentication())
+		comment.POST("/", controllers.CreateComment)
+		comment.GET("/", controllers.GetComments)
+		comment.PUT("/:commentId", controllers.UpdateComment)
+		comment.DELETE("/:commentId", controllers.DeleteComment)
+	}
+
 	return router
 }

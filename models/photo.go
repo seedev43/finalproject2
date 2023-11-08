@@ -17,6 +17,7 @@ type Photo struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	User      dto.UserResponse
+	Comments  []Comment
 }
 
 func (p *Photo) BeforeCreate(tx *gorm.DB) (err error) {

@@ -22,18 +22,18 @@ func UserRegister(ctx *gin.Context) {
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"id":       user.Id,
-		"email":    user.Email,
-		"username": user.Username,
-		"age":      user.Age,
-	})
+	res := dto.UserRegsiterResponse{
+		Id:       user.Id,
+		Email:    user.Email,
+		Username: user.Username,
+		Age:      user.Age,
+	}
+
+	ctx.JSON(http.StatusCreated, res)
 }
 
 func UserLogin(ctx *gin.Context) {
@@ -42,7 +42,6 @@ func UserLogin(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
 		return
-
 	}
 
 	password := user.Password
@@ -86,9 +85,7 @@ func UserUpdate(ctx *gin.Context) {
 
 	_, err := govalidator.ValidateStruct(request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -103,9 +100,7 @@ func UserUpdate(ctx *gin.Context) {
 	}
 
 	if err := database.DB.Model(&user).Where("id = ?", id).Updates(request).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -134,8 +129,6 @@ func UserDelete(ctx *gin.Context) {
 		})
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Your account has been succesfully deleted",
-	})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Your account has been succesfully deleted"})
 
 }

@@ -25,28 +25,27 @@ func CreatePhoto(ctx *gin.Context) {
 	photo.UserId = userId
 
 	if err := database.DB.Create(&photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"id":         photo.Id,
-		"title":      photo.Title,
-		"caption":    photo.Caption,
-		"user_id":    photo.UserId,
-		"created_at": photo.CreatedAt,
-	})
+	res := dto.PhotoCreateResponse{
+		Id:        photo.Id,
+		Title:     photo.Title,
+		Caption:   photo.Caption,
+		PhotoUrl:  photo.PhotoUrl,
+		UserId:    photo.UserId,
+		CreatedAt: photo.CreatedAt,
+	}
+
+	ctx.JSON(http.StatusCreated, res)
 }
 
 func GetPhotos(ctx *gin.Context) {
 	photos := []models.Photo{}
 
 	if err := database.DB.Preload("User").Find(&photos).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -82,19 +81,20 @@ func UpdatePhoto(ctx *gin.Context) {
 	}
 
 	if err := database.DB.Model(&photo).Where("id = ?", photoId).Updates(photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.PhotoResponse{
-		Id:       photoId,
-		Title:    photo.Title,
-		Caption:  photo.Caption,
-		PhotoUrl: photo.PhotoUrl,
-		UserId:   photo.UserId,
-	})
+	res := dto.PhotoUpdateResponse{
+		Id:        photoId,
+		Title:     photo.Title,
+		Caption:   photo.Caption,
+		PhotoUrl:  photo.PhotoUrl,
+		UserId:    photo.UserId,
+		UpdatedAt: photo.UpdatedAt,
+	}
+
+	ctx.JSON(http.StatusOK, res)
 }
 
 func DeletePhoto(ctx *gin.Context) {
@@ -121,9 +121,7 @@ func DeletePhoto(ctx *gin.Context) {
 	}
 
 	if err := database.DB.Where("id = ?", photoId).Delete(&photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
