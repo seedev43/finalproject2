@@ -1,1 +1,1 @@
-web: fp2
+web: go run main.go
