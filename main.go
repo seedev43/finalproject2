@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"fp2/database"
 	"fp2/routers"
 	"os"
@@ -8,6 +9,10 @@ import (
 
 func main() {
 	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		fmt.Println("port not set. Using default port 8080.")
+		PORT = "8080"
+	}
 
 	_, err := database.InitDB()
 
