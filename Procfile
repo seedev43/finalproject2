@@ -1,1 +1,1 @@
-web: bin/fp2
+web: fp2
