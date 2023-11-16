@@ -1,1 +1,1 @@
-web: ./fp2/main.go
+web: main
