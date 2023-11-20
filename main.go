@@ -20,6 +20,6 @@ func main() {
 		panic(err)
 	}
 
-	routers.SetupRouter().Run(PORT)
+	routers.SetupRouter().Run(":" + PORT)
 
 }
