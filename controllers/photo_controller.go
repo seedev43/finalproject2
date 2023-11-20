@@ -57,7 +57,7 @@ func GetPhoto(ctx *gin.Context) {
 }
 
 func GetPhotos(ctx *gin.Context) {
-	photos := []models.Photo{}
+	photos := []dto.PhotosResponse{}
 
 	if err := database.DB.Preload("User").Find(&photos).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

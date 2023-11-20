@@ -13,19 +13,13 @@ var DB *gorm.DB
 
 func InitDB() (*gorm.DB, error) {
 	var err error
-	// err = godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// 	return nil, err
-	// }
-
-	if os.Getenv("ENVIRONMENT") == "development" {
-		err = godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-			return nil, err
-		}
+	// if os.Getenv("ENVIRONMENT") == "development" {
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		return nil, err
 	}
+	// }
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
