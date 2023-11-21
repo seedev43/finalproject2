@@ -17,12 +17,18 @@ func UserRegister(ctx *gin.Context) {
 	user := models.User{}
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -40,7 +46,10 @@ func UserLogin(ctx *gin.Context) {
 	user := models.User{}
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
@@ -48,8 +57,8 @@ func UserLogin(ctx *gin.Context) {
 
 	if err := database.DB.Where("email = ?", user.Email).Take(&user).Error; err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unathorized",
-			"message": "Email not registered",
+			"code":  http.StatusUnauthorized,
+			"error": "Login failed",
 		})
 		return
 	}
@@ -58,16 +67,14 @@ func UserLogin(ctx *gin.Context) {
 
 	if !comparePass {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unathorized",
-			"message": "Invalid email/password",
+			"code":  http.StatusUnauthorized,
+			"error": "Invalid email/password",
 		})
 		return
 	}
 
 	token := helpers.GenerateToken(user.Id, user.Email)
-	ctx.JSON(http.StatusOK, gin.H{
-		"token": "Bearer " + token,
-	})
+	ctx.JSON(http.StatusOK, gin.H{"token": "Bearer " + token})
 }
 
 func UserUpdate(ctx *gin.Context) {
@@ -79,13 +86,19 @@ func UserUpdate(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -93,14 +106,17 @@ func UserUpdate(ctx *gin.Context) {
 
 	if user.Id != uint(id) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not authorized to edit this user.",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not authorized to edit this user.",
 		})
 		return
 	}
 
 	if err := database.DB.Model(&user).Where("id = ?", id).Updates(request).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -126,8 +142,8 @@ func UserDelete(ctx *gin.Context) {
 
 	if err := database.DB.Delete(&user).Error; err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorizated",
-			"message": err.Error(),
+			"code":  http.StatusUnauthorized,
+			"error": err.Error(),
 		})
 	}
 

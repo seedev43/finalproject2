@@ -19,7 +19,10 @@ func CreateComment(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&comment); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
@@ -34,7 +37,10 @@ func CreateComment(ctx *gin.Context) {
 	}
 
 	if err := database.DB.Create(&comment).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -55,8 +61,8 @@ func GetComment(ctx *gin.Context) {
 
 	if err := database.DB.Preload("User").Preload("Photo").First(&comment, commentId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
@@ -68,7 +74,10 @@ func GetComments(ctx *gin.Context) {
 	comments := []models.Comment{}
 
 	if err := database.DB.Preload("User").Preload("Photo").Find(&comments).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -83,28 +92,34 @@ func UpdateComment(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&comment); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	if err := database.DB.Select("user_id").First(&comment, commentId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if comment.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to edit this comment",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to edit this comment",
 		})
 		return
 	}
 
 	if err := database.DB.Model(&comment).Where("id = ?", commentId).Updates(comment).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -127,22 +142,25 @@ func DeleteComment(ctx *gin.Context) {
 
 	if err := database.DB.Select("user_id").First(&comment, commentId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if comment.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to delete this comment",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to delete this comment",
 		})
 		return
 	}
 
 	if err := database.DB.Where("id = ?", commentId).Delete(&comment).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 

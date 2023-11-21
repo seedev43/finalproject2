@@ -18,14 +18,20 @@ func CreateSocialMedia(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&socialMedia); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	socialMedia.UserId = userId
 
 	if err := database.DB.Create(&socialMedia).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -46,8 +52,8 @@ func GetSocialMedia(ctx *gin.Context) {
 
 	if err := database.DB.Preload("User").First(&socialMedia, socialMediaId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
@@ -59,7 +65,10 @@ func GetSocialMedias(ctx *gin.Context) {
 	socialMedias := []models.SocialMedia{}
 
 	if err := database.DB.Preload("User").Find(&socialMedias).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -74,28 +83,34 @@ func UpdateSocialMedia(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&socialMedia); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	if err := database.DB.Select("user_id").First(&socialMedia, socialMediaId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if socialMedia.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to edit this social media data",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to edit this social media data",
 		})
 		return
 	}
 
 	if err := database.DB.Model(&socialMedia).Where("id = ?", socialMediaId).Updates(socialMedia).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -118,22 +133,25 @@ func DeleteSocialMedia(ctx *gin.Context) {
 
 	if err := database.DB.Select("user_id").First(&socialMedia, socialMediaId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if socialMedia.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to delete this social media data",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to delete this social media data",
 		})
 		return
 	}
 
 	if err := database.DB.Where("id = ?", socialMediaId).Delete(&socialMedia).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 

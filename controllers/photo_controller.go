@@ -18,14 +18,20 @@ func CreatePhoto(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&photo); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	photo.UserId = userId
 
 	if err := database.DB.Create(&photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -47,8 +53,8 @@ func GetPhoto(ctx *gin.Context) {
 
 	if err := database.DB.Preload("User").First(&photo, photoId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
@@ -60,7 +66,10 @@ func GetPhotos(ctx *gin.Context) {
 	photos := []dto.PhotosResponse{}
 
 	if err := database.DB.Preload("User").Find(&photos).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -75,28 +84,34 @@ func UpdatePhoto(ctx *gin.Context) {
 	userId := uint(userData["id"].(float64))
 
 	if err := ctx.ShouldBindJSON(&photo); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input must be in JSON format"})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": "Input must be in JSON format",
+		})
 		return
 	}
 
 	if err := database.DB.Select("user_id").First(&photo, photoId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if photo.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to edit this photo data",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to edit this photo data",
 		})
 		return
 	}
 
 	if err := database.DB.Model(&photo).Where("id = ?", photoId).Updates(photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -121,22 +136,25 @@ func DeletePhoto(ctx *gin.Context) {
 
 	if err := database.DB.Select("user_id").First(&photo, photoId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"error":   "Not Found",
-			"message": "Data not found",
+			"code":  http.StatusNotFound,
+			"error": "Data not found",
 		})
 		return
 	}
 
 	if photo.UserId != userId {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "You are not allowed to delete this photo data",
+			"code":  http.StatusUnauthorized,
+			"error": "You are not allowed to delete this photo data",
 		})
 		return
 	}
 
 	if err := database.DB.Where("id = ?", photoId).Delete(&photo).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":  http.StatusBadRequest,
+			"error": err.Error(),
+		})
 		return
 	}
 
