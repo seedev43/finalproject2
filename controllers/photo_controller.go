@@ -48,7 +48,7 @@ func CreatePhoto(ctx *gin.Context) {
 }
 
 func GetPhoto(ctx *gin.Context) {
-	photo := models.Photo{}
+	photo := dto.PhotosResponse{}
 	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
 
 	if err := database.DB.Preload("User").First(&photo, photoId).Error; err != nil {
