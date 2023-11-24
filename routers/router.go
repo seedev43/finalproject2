@@ -3,6 +3,7 @@ package routers
 import (
 	"fp2/controllers"
 	"fp2/middlewares"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,9 +11,12 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, "Hi!")
+	})
+
 	user := router.Group("/users")
 	{
-
 		user.POST("/register", controllers.UserRegister)
 		user.POST("/login", controllers.UserLogin)
 		user.PUT("/:userId", middlewares.Authentication(), controllers.UserUpdate)
